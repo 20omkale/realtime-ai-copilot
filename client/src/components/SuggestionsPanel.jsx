@@ -66,7 +66,7 @@ export default function SuggestionsPanel() {
 
               <div className="grid gap-3">
                 {batch.items.map((sug) => {
-                  const isProcessed = processedSuggestions.has(sug.id);
+                  const isProcessed = processedSuggestions.includes(sug.id);
                   
                   return (
                     <button
