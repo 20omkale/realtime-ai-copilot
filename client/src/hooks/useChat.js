@@ -19,7 +19,7 @@ export const useChat = () => {
 
   const sendMessage = async (query, suggestionId = null) => {
     // 0. DEDUPLICATION CHECK
-    if (suggestionId && processedSuggestions.has(suggestionId)) {
+    if (suggestionId && processedSuggestions.includes(suggestionId)) {
       return;
     }
 
