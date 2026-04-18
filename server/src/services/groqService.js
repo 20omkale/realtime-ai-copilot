@@ -55,10 +55,9 @@ class GroqService {
         You are a real-time meeting copilot. 
         Analyze the transcript and provide EXACTLY 3 helpful suggestions.
         Vary the types: one question, one talking point, one fact-check or clarification.
-        Return ONLY valid JSON in the format:
+        Return ONLY a raw JSON array in this format:
         [
-          { "title": "Heading", "preview": "Short takeaway...", "type": "question|insight|clarification" },
-          ...
+          { "title": "Heading", "preview": "Short takeaway...", "type": "question|insight|clarification" }
         ]
       `;
 
@@ -67,23 +66,32 @@ class GroqService {
         {
           model: model,
           messages: [
-            { role: "system", content: "You are a professional assistant that outputs only valid JSON arrays." },
-            { role: "user", content: `${systemPrompt}\n\nTranscript: ${transcript.slice(-2000)}` },
+            { role: "system", content: "You are a professional assistant that outputs ONLY valid JSON. No conversational filler." },
+            { role: "user", content: `${systemPrompt}\n\nTranscript: ${transcript.slice(-2500)}` },
           ],
-          temperature: 0.7,
-          response_format: { type: "json_object" }, // Use JSON mode if supported by model, though array is tricky in some JSON modes
+          temperature: 0.5,
+          // JSON mode is disabled here to favor raw array extraction which is more flexible across models
         },
         { headers: this._getHeaders(apiKey) }
       );
 
-      let content = response.data.choices[0].message.content;
+      let content = response.data.choices[0].message.content.trim();
       
-      // Basic cleanup in case of markdown wrap
-      if (content.includes("```")) {
-        content = content.replace(/```json|```/g, "").trim();
+      // Senior-level robust JSON extraction (handles markdown and text wrapping)
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        content = jsonMatch[0];
       }
 
-      return JSON.parse(content);
+      try {
+        return JSON.parse(content);
+      } catch (parseErr) {
+        console.error("JSON Parse Error. Raw content:", content);
+        // Fallback for malformed AI output
+        return [
+          { title: "Context analyzing...", preview: "I'm still processing the conversation flow.", type: "insight" }
+        ];
+      }
     } catch (error) {
       console.error("Groq Suggestion Error:", error.response?.data || error.message);
       throw error;
