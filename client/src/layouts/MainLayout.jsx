@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import StatusBanner from "../components/StatusBanner";
 import SettingsModal from "../components/SettingsModal";
 import ExportButton from "../components/ExportButton";
-import { Settings, Zap } from "lucide-react";
+import { Settings, Zap, Trash2 } from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
 import axios from "axios";
 import { API_URL } from "../config";
 
 export default function MainLayout({ children }) {
   const [showSettings, setShowSettings] = useState(false);
-  const { transcript, suggestions, chat, setApiKey, setBackendOnline } = useAppStore();
+  const { transcript, suggestions, chat, setApiKey, setBackendOnline, clearSession } = useAppStore();
 
   // HEARBEAT: Poll backend health every 5s
   useEffect(() => {
