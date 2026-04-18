@@ -1,5 +1,7 @@
 # 🚀 TwinMind Live Copilot
 
+## 🔗 Live Demo: [realtime-ai-copilot.vercel.app](https://realtime-ai-copilot.vercel.app)
+
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20Service%20Layer-blue)
 ![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node%20%7C%20Groq%20%7C%20Vite-green)
 ![Design](https://img.shields.io/badge/Design-Glassmorphism-purple)
