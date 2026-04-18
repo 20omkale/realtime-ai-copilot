@@ -1,8 +1,8 @@
-const express = require("express");
-const cors = require("cors");
-const transcribeRoute = require("./routes/transcribe");
-const suggestRoute = require("./routes/suggest");
-const chatRoute = require("./routes/chat");
+import express from "express";
+import cors from "cors";
+import transcribeRoute from "./routes/transcribe.js";
+import suggestRoute from "./routes/suggest.js";
+import chatRoute from "./routes/chat.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,7 +40,7 @@ const server = app.listen(PORT, "0.0.0.0", () => {
 
 // HEARTBEAT Logic (Prevents premature exits in restricted environments)
 setInterval(() => {
-  if (server.listening) {
+  if (server && server.listening) {
     // Healthy
   }
 }, 30000);
