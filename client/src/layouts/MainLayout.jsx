@@ -45,6 +45,17 @@ export default function MainLayout({ children }) {
         <div className="flex items-center gap-2">
           <ExportButton />
           <button 
+            onClick={() => {
+              if (window.confirm("Are you sure you want to clear this session?")) {
+                clearSession();
+              }
+            }}
+            className="p-2 rounded-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-all border border-white/10"
+            title="Clear Session"
+          >
+            <Trash2 size={18} />
+          </button>
+          <button 
             onClick={() => setShowSettings(true)}
             className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
           >
