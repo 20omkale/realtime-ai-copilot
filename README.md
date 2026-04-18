@@ -1,83 +1,89 @@
 # 🚀 TwinMind Live Copilot
 
 ![Architecture](https://img.shields.io/badge/Architecture-Clean%20Service%20Layer-blue)
-![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node%20%7C%20Groq-green)
+![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node%20%7C%20Groq%20%7C%20Vite-green)
 ![Design](https://img.shields.io/badge/Design-Glassmorphism-purple)
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
 
-> **Official Senior Developer Submission**: A production-grade AI meeting assistant that handles real-time audio orchestration, stateful deduplication, and contextual AI insights.
+> **Official Senior Developer Submission**: A professional-grade AI meeting assistant featuring real-time audio orchestration, stateful deduplication, and high-quality, contextual AI insights.
 
 ---
 
 ## 📽️ Project Overview
-TwinMind Live is an AI-powered meeting companion that transcribes live audio in 30-second intervals, generates context-aware suggestions, and provides a continuous chat interface for deep-dive queries.
+TwinMind Live is an AI-powered meeting companion that transcribes live audio in 30-second intervals, generates **strategic suggestions**, and provides a continuous chat interface for deep-dive queries.
 
-### ✨ Key Senior Features
-- **Deterministic 30s Record Cycle**: A robust, battery-tested recursive system for consistent audio chunking.
-- **Stateful Deduplication Engine**: Prevents expensive and redundant AI chat queries by tracking suggestion IDs across the session.
-- **System Heartbeat & Health Banners**: Proactive frontend monitoring of backend connectivity.
-- **Optimistic UI Execution**: Instant user feedback in the chat panel with asynchronous backend validation.
+### ✨ Senior-Level Features
+- **Deterministic 30s Recording Cycle**: A robust, recursive system for consistent audio chunking and transcription.
+- **Strategic AI Suggestions**: Contextual insights (Fact-checks, Talking Points, Questions) that adapt to the conversation topic and language.
+- **Session Persistence**: Built-in state recovery using Zustand middleware to survive browser refreshes.
+- **One-Click Export**: Comprehensive session logging (Transcript + Suggestions + Chat) for post-meeting analysis.
+- **Optimistic UI Engine**: Zero-latency chat feedback with asynchronous backend synchronization.
 
 ---
 
-## 🛠️ Stack Choices & Rationale
-We selected a modern, high-performance stack to handle the low-latency requirements of a live copilot:
-
-| Technology | Rationale |
-| :--- | :--- |
-| **React + Vite** | Blazing fast HMR and optimized build cycles for real-time UI development. |
-| **Node.js (Express)** | Proven asynchronous performance for handling simultaneous transcription and AI completion requests. |
-| **Zustand** | Light-weight, high-performance store state management. Scalable without the boilerplate of Redux. |
-| **Groq (Whisper V3)** | Selected for industry-leading transcription speed (SOTA accuracy with <1s latency). |
-| **Llama 3.3 (70B)** | Chosen for its superior reasoning in context-aware meeting summaries and chat. |
+## 🏗️ Architecture
+```mermaid
+graph TD
+    A[Browser Mic] -->|WebM Chunks| B(Vite/React Frontend)
+    B -->|Whisper V3| C[Groq AI Audio API]
+    B -->|Context History| D(Express Backend)
+    D -->|Llama 3.3 70B| E[Groq AI Chat API]
+    D -->|Insights| B
+    B -->|State Persistence| F[(LocalStorage)]
+    B -->|Export| G[TXT Session Log]
+```
 
 ---
 
 ## 🤖 Prompt Strategy & AI Engineering
-The AI interaction is governed by specialized system prompts designed for "Meeting Context":
 
-### 1. Suggestion Generation
-- **Strategy**: Zero-shot JSON orchestration. 
-- **Goal**: Force the model to return exactly 3 varied insights (Question, Talking Point, Clarification).
-- **Constraints**: Stripped of conversational filler to ensure the UI can parse and render suggestions instantly.
+### 1. Strategic Advisor Persona
+We bypass generic AI conversationalism by using a **Top-Tier Meeting Consultant** persona. 
+- **Focus**: Key stakeholder mentions, project dependencies, and potential scope creep.
+- **Technique**: Dynamic mapping ensures that even if the AI's JSON output varies slightly, the interface remains stable and content-rich.
 
-### 2. Live Chat Assistant
-- **Strategy**: Contextual RAG (Sliding Window).
-- **Goal**: Uses the most recent 1500 characters of transcripts as a "primary context" to answer user queries without exceeding token limits or losing focus.
+### 2. Contextual RAG (Sliding Window)
+The chat uses a rolling 3000-character context window. This ensures the AI has enough history to be "aware" of the conversation flow without being bogged down by redundant data or hitting token limits.
+
+---
+
+## 🛠️ Stack Choices & Rationale
+We selected a modern, high-performance stack for low-latency live interactions.
+
+| Technology | Rationale |
+| :--- | :--- |
+| **Groq (Whisper V3)** | Selected for industry-leading transcription speed (<1s latency for 30s audio). |
+| **Llama 3.3 (70B)** | Chosen for superior reasoning in multi-lingual meeting summaries. |
+| **Zustand + Persist** | Light-weight, high-performance store with built-in hydration for session recovery. |
+| **Glassmorphism UI** | A premium, modern aesthetic that feels like a next-gen productivity tool. |
 
 ---
 
 ## ⚖️ Technical Tradeoffs
-- **WebM vs WAV**: We chose WebM for audio chunking to minimize data transfer size, prioritizing speed over raw audio fidelity (which Whisper handles perfectly).
-- **Polling vs WebSockets**: For this assignment's scale, we used polished HTTP Polling for health checks to maintain simplicity and reliability without the overhead of WebSocket state management on short-lived backend processes.
-- **Zustand vs LocalState**: Centralized all AI data in Zustand to enable cross-panel deduplication, choosing it over React Context to avoid unnecessary re-renders.
+- **Polling vs WebSockets**: Polished HTTP Polling (5s) was chosen for health checks to maintain simplicity and reliability in the current serverless-compatible architecture.
+- **Client-Side Storage**: We opted for `localStorage` persistence for session data to provide a "crash-proof" experience without the overhead of a formal production database for this prototype.
+- **Audio Compression**: WebM format was selected to minimize bandwidth during chunk uploads without sacrificing Whisper's transcription accuracy.
 
 ---
 
 ## 🚀 Setup & Installation
 
-### 1. Backend
+### 1. Backend (Server)
 ```bash
 cd server
 npm install
-# Create .env based on .env.example
+# Configure .env (PORT, FRONTEND_URL)
 node src/index.js
 ```
 
-### 2. Frontend
+### 2. Frontend (Client)
 ```bash
 cd client
 npm install
-# Create .env based on .env.example
+# Configure .env (VITE_API_URL)
 npm run dev
 ```
 
 ---
 
-## ☁️ Cloud Deployment
-- **Frontend**: Deployed via Vercel for high-availability.
-- **Backend**: Deployed via Render/Railway with environment variable support for dynamic CORS.
-
----
-
-**Developed with ❤️ by Om Kale (Senior Full-Stack Submission).**
+**Developed with ❤️ for the TwinMind Engineering Challenge.**

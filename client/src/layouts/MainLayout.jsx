@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import StatusBanner from "../components/StatusBanner";
 import SettingsModal from "../components/SettingsModal";
-import { Settings, Download, Zap } from "lucide-react";
+import ExportButton from "../components/ExportButton";
+import { Settings, Zap } from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
 import axios from "axios";
 import { API_URL } from "../config";
@@ -26,22 +27,6 @@ export default function MainLayout({ children }) {
     return () => clearInterval(interval);
   }, [setBackendOnline]);
 
-  const handleExport = () => {
-    const data = {
-      timestamp: new Date().toISOString(),
-      transcript,
-      suggestions_batches: suggestions,
-      chat_history: chat,
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `twinmind-session-${new Date().getTime()}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#0a0a0c] text-slate-100 font-sans">
@@ -58,13 +43,7 @@ export default function MainLayout({ children }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button 
-            onClick={handleExport}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
-          >
-            <Download size={14} />
-            Export Session
-          </button>
+          <ExportButton />
           <button 
             onClick={() => setShowSettings(true)}
             className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"

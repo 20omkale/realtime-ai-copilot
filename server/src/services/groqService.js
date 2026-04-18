@@ -3,7 +3,7 @@ import FormData from "form-data";
 
 /**
  * GroqService handles all interactions with the Groq API.
- * Designed for production reliability and clean error handling.
+ * Refactored for Strategic Context-Awareness and Production Stability.
  */
 class GroqService {
   constructor() {
@@ -41,25 +41,27 @@ class GroqService {
   }
 
   /**
-   * High-Quality Suggestion Strategy
-   * Focuses on contextual deep-analysis and creative insights.
+   * Strategic Suggestion Engine
+   * Generates varied, contextual insights based on the transcript history.
    */
   async generateSuggestions(transcript, apiKey, { model = "llama-3.3-70b-versatile", prompt = "" } = {}) {
     try {
-      // PROMPT UPGRADE: Focus on quality and context, remove mimicry examples.
-      const systemPrompt = prompt || `
-        You are a Top-Tier Meeting Consultant. 
-        Your goal is to analyze transcripts and provide 3 highly specific, creative, and ACTIONABLE insights.
+      const systemPrompt = `
+        You are an Elite Meeting Copilot and Strategic Advisor.
+        Your task is to listen to the provided transcript and generate EXACTLY 3 high-value suggestions.
         
-        RULES:
-        1. NEVER use generic titles like "Insight Found" or "Talking Point".
-        2. Create titles that specifically wrap the keywords of the conversation.
-        3. Preview must be 1-2 sentences of deep reasoning.
-        4. Detect the language of the transcript and respond in that same language.
+        CRITICAL GUIDELINES:
+        1. NO GENERIC TITLES: Never use "Insight," "Question," or "Clarification" as a title. 
+        2. BE SPECIFIC: Titles must use keywords directly from the conversation (e.g., "Project X Delay Impact").
+        3. VARIETY: Provide a mix of:
+           - A provocative question to move the meeting forward.
+           - A summary of a key talking point just discussed.
+           - A fact-check or clarification if someone sounds uncertain.
+        4. LANGUAGE: Detect the language used in the transcript and respond in that same language.
+        5. PREVIEW QUALITY: The preview must be 1-2 sentences of deep synthesis, not just a repeat of the transcript.
         
         OUTPUT FORMAT:
-        You must return ONLY a JSON array with these keys: 
-        "title" (catchy, specific), "preview" (detailed), and "type" (one of: question, insight, clarification).
+        Return ONLY a JSON array of objects with keys: "title", "preview", and "type".
       `;
 
       const response = await axios.post(
@@ -67,40 +69,40 @@ class GroqService {
         {
           model: model,
           messages: [
-            { role: "system", content: "You are a professional assistant that outputs ONLY raw JSON arrays. Do not apologize or explain." },
-            { role: "user", content: `${systemPrompt}\n\nTranscript: ${transcript.slice(-3000)}` },
+            { role: "system", content: systemPrompt },
+            { role: "user", content: `Contextual Transcript:\n${transcript.slice(-3000)}\n\nGenerate the 3 suggestions now.` },
           ],
-          temperature: 0.8, // Increased for better creative analysis
+          temperature: 0.7, 
         },
         { headers: this._getHeaders(apiKey) }
       );
 
       let content = response.data.choices[0].message.content.trim();
       
-      // Extract array
+      // Professional-grade JSON Extraction
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       if (jsonMatch) content = jsonMatch[0];
 
       try {
-        let rawItems = JSON.parse(content);
-        if (!Array.isArray(rawItems)) {
-          if (rawItems.suggestions) rawItems = rawItems.suggestions;
-          else if (rawItems.items) rawItems = rawItems.items;
-          else rawItems = [rawItems];
+        let items = JSON.parse(content);
+        if (!Array.isArray(items)) {
+          if (items.suggestions) items = items.suggestions;
+          else if (items.items) items = items.items;
+          else items = [items];
         }
 
-        // Final Normalization for any key mismatches
-        return rawItems.map(item => ({
-          title: item.title || item.headline || item.topic || "Discussion Analysis",
-          preview: item.preview || item.text || item.content || "Contextual details found in transcript.",
+        // Final Normalization mapping synonyms to expected keys
+        return items.map(item => ({
+          title: item.title || item.headline || item.topic || "Strategic Insight",
+          preview: item.preview || item.text || item.content || "Contextual details provided above.",
           type: item.type || "insight",
           id: item.id || Date.now() + Math.random().toString(36).substr(2, 9)
         })).slice(0, 3);
 
-      } catch (parseErr) {
-        console.error("Parse Error. Raw was:", content);
+      } catch (e) {
+        console.error("AI Output Parsing Failed. RAW:", content);
         return [
-          { title: "Analyzing Meeting...", preview: "Processing the latest audio stream for insights.", type: "insight", id: "err-" + Date.now() }
+          { title: "Analyzing Meeting Flow...", preview: "Processing the conversation for deep-dive suggestions.", type: "insight", id: "error-" + Date.now() }
         ];
       }
     } catch (error) {
@@ -109,13 +111,21 @@ class GroqService {
     }
   }
 
+  /**
+   * Detailed Chat Response Engine
+   */
   async chat(messages, apiKey, { model = "llama-3.3-70b-versatile" } = {}) {
     try {
-      const response = await axios.post(`${this.baseUrl}/chat/completions`, {
-        model,
-        messages,
-        temperature: 0.5,
-      }, { headers: this._getHeaders(apiKey) });
+      const response = await axios.post(
+        `${this.baseUrl}/chat/completions`,
+        {
+          model: model,
+          messages,
+          temperature: 0.5,
+        },
+        { headers: this._getHeaders(apiKey) }
+      );
+
       return response.data.choices[0].message.content;
     } catch (error) {
       console.error("Groq Chat Error:", error.response?.data || error.message);
